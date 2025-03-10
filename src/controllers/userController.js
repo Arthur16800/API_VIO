@@ -1,51 +1,47 @@
 const connect = require("../db/connect");
+const validateUser = require("../services/validateUser");
+const validateCpf = require("../services/validateCpf")
 
 module.exports = class userController {
   static async createUser(req, res) {
     const { cpf, email, password, name, data_nascimento } = req.body;
+    const validation = validateUser(req.body);
 
-    if (!cpf || !email || !password || !name || !data_nascimento) {
-      return res
-        .status(400)
-        .json({ error: "Todos os campos devem ser preenchidos" });
-    } else if (isNaN(cpf) || cpf.length !== 11) {
-      return res.status(400).json({
-        error: "CPF inválido. Deve conter exatamente 11 dígitos numéricos",
-      });
-    } else if (!email.includes("@")) {
-      return res.status(400).json({ error: "Email inválido. Deve conter @" });
-    } else {
-      // Construção da query INSERT
-      const query = `INSERT INTO usuario (cpf, password, email, name, data_nascimento) VALUES ('${cpf}', '${password}', '${email}', '${name}', '${data_nascimento}')`;
-      //executando a query criada
-      try {
-        connect.query(query, function (err, results) {
-          if (err) {
-            console.log(err);
-            console.log(err.code);
-            if (err.code === "ER_DUP_ENTRY") {
-              return res
-                .status(400)
-                .json({
-                  error: "O email ou cpf já está vinculado a outro usuário",
-                });
-            } 
-            else {
-              return res.status(500).json({
-                error: "erro interno do servidor :(",
-              });
-            }
-          } 
-          else {
-            return res
-              .status(201)
-              .json({ message: "Usuário cadastrado com sucesso" });
+    if (validation) {
+      return res.status(400).json(validation);
+    }
+
+    const cpfValidation = await validateCpf(cpf, null)
+    if(cpfValidation){
+      return res.status(400).json(cpfValidation)
+    }
+
+    // Construção da query INSERT
+    const query = `INSERT INTO usuario (cpf, password, email, name, data_nascimento) VALUES ('${cpf}', '${password}', '${email}', '${name}', '${data_nascimento}')`;
+    //executando a query criada
+    try {
+      connect.query(query, function (err, results) {
+        if (err) {
+          console.log(err);
+          console.log(err.code);
+          if (err.code === "ER_DUP_ENTRY") {
+            return res.status(400).json({
+              error: "O email ou cpf já está vinculado a outro usuário",
+            });
+          } else {
+            return res.status(500).json({
+              error: "erro interno do servidor :(",
+            });
           }
-        });
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Erro interno do servidor" });
-      }
+        } else {
+          return res
+            .status(201)
+            .json({ message: "Usuário cadastrado com sucesso" });
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Erro interno do servidor" });
     }
   }
 
@@ -71,13 +67,17 @@ module.exports = class userController {
   static async updateUser(req, res) {
     //Desestrutura e recupera os dados enviados via corpo da requisição
     const { id, name, email, password, cpf } = req.body;
+    const validation = validateUser(req.body);
 
-    //Validar se todos os campos foram peenchidos
-    if (!id || !name || !email || !password || !cpf) {
-      return res
-        .status(400)
-        .json({ error: "Todos os campos devem ser preenchidos" });
+    const cpfValidation = await validateCpf(cpf, id)
+    if(cpfValidation){
+      return res.status(400).json(cpfValidation)
     }
+
+    if (validation) {
+      return res.status(400).json(validation);
+    }
+
     const query = `UPDATE usuario SET name=?, email=?, password=?, cpf=? WHERE id_usuario=?`;
     const values = [name, email, password, cpf, id];
 
