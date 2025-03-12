@@ -21,3 +21,4 @@ module.exports = function validateUser({
 
   return null; // Retorna null se não houver erro
 };
+
