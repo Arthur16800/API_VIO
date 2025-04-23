@@ -30,7 +30,9 @@ router.get('/evento/semana/:data', eventoController.getEventosSemana);
 // Rotas ingressoController
 router.post('/ingresso', ingressoController.createIngresso);
 router.get('/ingresso', ingressoController.getAllIngressos);
+router.get('/ingresso/evento/:id', ingressoController.getByIdEvento);
 router.put('/ingresso', ingressoController.updateIngresso);
 router.delete('/ingresso/:id', ingressoController.deleteIngresso);
+
 
 module.exports = router;
