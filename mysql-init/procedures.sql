@@ -1,13 +1,24 @@
-delimiter //
-
-create procedure registrar_compra(
+CREATE PROCEDURE `registrar_compra`(
     in p_id_usuario int,
     in p_id_ingresso int,
     in p_quantidade int
 )
 begin
     declare v_id_compra int;
-
+    declare v_data_evento datetime;
+    
+    -- obtem a data do evento
+    select e.data_hora into v_data_evento
+    from ingresso i 
+    join evento e on i.fk_id_evento = e.id_evento
+	where i.id_ingresso  =  p_id_ingresso;
+    
+    -- verificar se a data do evento é menor que a atual
+    if date(v_data_evento) < curdate() then
+		signal sqlstate '45000'
+        set message_text = 'ERRO_PROCEDURE - Não é possivel comprar ingressos para eventos passados';
+	end if;
+    
     -- Criar registro na tabela 'compra'
     insert into compra (data_compra, fk_id_usuario)
     values (now(), p_id_usuario);
@@ -67,3 +78,5 @@ end; //
 
 delimiter ;
 
+insert into evento (nome, data_hora,local, descricao,fk_id_organizador) values
+ ('Feira Cultural de Inverno', '2025-07-20', 'Parque Municipal', 'Evento cultural com música e gastronomia.', 1);

@@ -12,3 +12,41 @@ begin
     join 
     evento e on i.fk_id_evento = e.id_evento 
     where i.id_ingresso = new.fk_id_ingresso;
+
+    -- Verificar se o evento já ocorreu
+    if date(data_evento) < curdate() then
+        signal sqlstate '45000'
+        set message_text = 'Não é possível comprar ingressos para eventos passados.';
+    end if;
+end;//
+
+delimiter ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
