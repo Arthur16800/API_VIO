@@ -1,3 +1,5 @@
+delimiter //
+
 CREATE PROCEDURE `registrar_compra`(
     in p_id_usuario int,
     in p_id_ingresso int,
