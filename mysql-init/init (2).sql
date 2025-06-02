@@ -31,7 +31,7 @@ CREATE TABLE `compra` (
   PRIMARY KEY (`id_compra`),
   KEY `fk_id_usuario` (`fk_id_usuario`),
   CONSTRAINT `compra_ibfk_1` FOREIGN KEY (`fk_id_usuario`) REFERENCES `usuario` (`id_usuario`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,7 +40,7 @@ CREATE TABLE `compra` (
 
 LOCK TABLES `compra` WRITE;
 /*!40000 ALTER TABLE `compra` DISABLE KEYS */;
-INSERT INTO `compra` VALUES (1,'2024-11-14 19:04:00',1),(2,'2024-11-13 17:00:00',1),(3,'2024-11-12 15:30:00',2),(4,'2024-11-11 14:20:00',2),(5,'2025-05-12 10:51:14',3),(6,'2025-05-12 13:10:30',4),(7,'2025-05-12 13:18:31',7),(8,'2025-05-12 13:26:04',7),(9,'2025-06-02 08:50:06',1),(10,'2025-06-02 08:50:27',1),(11,'2025-06-02 11:14:14',1),(12,'2025-06-02 11:15:00',1),(13,'2025-06-02 11:15:37',1),(14,'2025-06-02 11:15:45',1),(15,'2025-06-02 11:15:53',1),(16,'2025-06-02 11:16:00',1),(17,'2025-06-02 11:16:03',1);
+INSERT INTO `compra` VALUES (1,'2024-11-14 19:04:00',1),(2,'2024-11-13 17:00:00',1),(3,'2024-11-12 15:30:00',2),(4,'2024-11-11 14:20:00',2),(5,'2025-05-12 10:51:14',3),(6,'2025-05-12 13:10:30',4),(7,'2025-05-12 13:18:31',7),(8,'2025-05-12 13:26:04',7),(9,'2025-06-02 08:50:06',1),(10,'2025-06-02 08:50:27',1),(11,'2025-06-02 11:14:14',1),(12,'2025-06-02 11:15:00',1),(13,'2025-06-02 11:15:37',1),(14,'2025-06-02 11:15:45',1),(15,'2025-06-02 11:15:53',1),(16,'2025-06-02 11:16:00',1),(17,'2025-06-02 11:16:03',1),(19,'2025-06-02 11:24:17',1),(21,'2025-06-02 11:24:28',1);
 /*!40000 ALTER TABLE `compra` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -156,7 +156,7 @@ CREATE TABLE `ingresso_compra` (
   KEY `fk_id_compra` (`fk_id_compra`),
   CONSTRAINT `ingresso_compra_ibfk_1` FOREIGN KEY (`fk_id_ingresso`) REFERENCES `ingresso` (`id_ingresso`),
   CONSTRAINT `ingresso_compra_ibfk_2` FOREIGN KEY (`fk_id_compra`) REFERENCES `compra` (`id_compra`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -165,7 +165,7 @@ CREATE TABLE `ingresso_compra` (
 
 LOCK TABLES `ingresso_compra` WRITE;
 /*!40000 ALTER TABLE `ingresso_compra` DISABLE KEYS */;
-INSERT INTO `ingresso_compra` VALUES (1,5,4,1),(2,2,5,1),(3,1,1,2),(4,2,2,2),(5,2,5,5),(6,10,7,8),(8,3,7,10),(9,2,6,12),(10,1,7,12),(11,2,6,14),(12,1,7,14),(13,2,6,15),(14,2,6,16),(15,1,7,16),(16,2,6,17),(17,1,7,17);
+INSERT INTO `ingresso_compra` VALUES (1,5,4,1),(2,2,5,1),(3,1,1,2),(4,2,2,2),(5,2,5,5),(6,10,7,8),(8,3,7,10),(9,2,6,12),(10,1,7,12),(11,2,6,14),(12,1,7,14),(13,2,6,15),(14,2,6,16),(15,1,7,16),(16,2,6,17),(17,1,7,17),(18,2,6,19),(19,1,7,19),(20,2,6,21),(21,1,7,21);
 /*!40000 ALTER TABLE `ingresso_compra` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -367,6 +367,8 @@ begin
     
     -- verificar se a data do evento é menor que a atual
     if date(v_data_evento) < curdate() then
+		delete from ingresso_compra where fk_id_compra = p_id_compra;
+        delete from compra where id_compra = p_id_compra;
 		signal sqlstate '45000'
         set message_text = 'ERRO_PROCEDURE - Não é possivel comprar ingressos para eventos passados';
 	end if;
@@ -409,4 +411,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-02 11:18:04
+-- Dump completed on 2025-06-02 11:25:53
