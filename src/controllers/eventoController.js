@@ -4,6 +4,7 @@ module.exports = class eventoController {
   // criação de um evento
   static async createEvento(req, res) {
     const { nome, descricao, data_hora, local, fk_id_organizador } = req.body;
+    const imagem = req.file?.buffer || null;
 
     // validação genérica de todos os atributos
     if (!nome || !descricao || !data_hora || !local || !fk_id_organizador) {
@@ -12,8 +13,8 @@ module.exports = class eventoController {
         .json({ error: "Todos os campos devem ser preenchidos!" });
     }
 
-    const query = `insert into evento (nome, descricao, data_hora, local, fk_id_organizador) values (?, ?, ?, ?, ?)`; //placeholder, transiçao entre os dados que chegam
-    const values = [nome, descricao, data_hora, local, fk_id_organizador];
+    const query = `insert into evento (nome, descricao, data_hora, local, fk_id_organizador, imagem) values (?, ?, ?, ?, ?, ?)`; //placeholder, transiçao entre os dados que chegam
+    const values = [nome, descricao, data_hora, local, fk_id_organizador, imagem];
     try {
       connect.query(query, values, (err) => {
         if (err) {
@@ -53,8 +54,6 @@ module.exports = class eventoController {
   static async updateEvento(req, res) {
     const { id_evento, nome, descricao, data_hora, local, fk_id_organizador } =
       req.body;
-
-    // validação genérica de todos os atributos
     if (
       !id_evento ||
       !nome ||
@@ -193,4 +192,14 @@ module.exports = class eventoController {
       return res.status(500).json({ error: "Erro Interno de Servidor" });
     }
   }
+
+  static async getImagemEvento(req, res){
+    const id = req.params.id;
+    const query = "SELECT imagem FROM evento WHERE id_evento=?";
+    if(err || results.length === 0 || !results[0].imagem){
+      return res.status.json(404).send("Imagem não encontrada")
+    }
+    res.set("Content-Type", "image/png");
+    return res.send(results[0].image);
+  } 
 };
